@@ -40,7 +40,7 @@ const DriverSchema = new Schema(
       type: Number,
       required: true,
     },
-    value: {
+    kmMin: {
       type: Number,
       required: true,
     },

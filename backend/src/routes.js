@@ -2,11 +2,15 @@ const express = require("express");
 
 const router = express.Router();
 
+// Driver
 const {
     getDrivers,
     createDriver,
-    estimate
-} = require("./controllers/DriverControllers")
+} = require("./controllers/DriverController")
+
+// Ride
+
+const {estimate} = require("./controllers/RideController")
 
 router.get("/getDriver", (req, res) => getDrivers(req, res));
 

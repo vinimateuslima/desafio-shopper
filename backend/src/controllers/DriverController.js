@@ -12,11 +12,11 @@ const getDrivers = async (req, res) => {
 
 const createDriver = async (req, res) => {
   try {
-    const { id, name, description, vehicle, value, tax, review } = req.body;
+    const { id, name, description, vehicle, tax, kmMin, review } = req.body;
 
     const existingDriver = await Driver.findOne({ id: id });
 
-    if (!id || !name || !description || !vehicle || !value || !review || !tax) {
+    if (!id || !name || !description || !vehicle || !kmMin || !review || !tax) {
       return res
         .status(400)
         .json({ msg: "Por favor, preencha todos os campos obrigatórios." });
@@ -40,8 +40,8 @@ const createDriver = async (req, res) => {
       name,
       description,
       vehicle,
-      value,
       tax,
+      kmMin,
       review: review || [],
     });
 
@@ -57,35 +57,7 @@ const createDriver = async (req, res) => {
   }
 };
 
-
-const estimate = async (req, res) => {
-    const { customer_id, origin, destination} = req.body;
-
-    if (!customer_id || !origin || !destination) {
-        return res
-        .status(400)
-        .json({ msg: "Por favor, preencha todos os campos obrigatórios." });
-    }
-
-    if (origin == destination) {
-        return res
-        .status(400)
-        .json({ msg: "Os endereços não podem ser iguais" });
-    }
-
-    fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${process.env.GOOGLE_API_KEY}`)
-    .then(response => response.json())
-    .then(data => 
-        res.status(200).json(data)
-    )
-    .catch(error => console.error('Erro:', error));
-
-    
-
-}
-
 module.exports = {
   getDrivers,
   createDriver,
-  estimate
 };
