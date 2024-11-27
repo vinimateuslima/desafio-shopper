@@ -1,4 +1,5 @@
 const Driver = require("../models/Driver");
+
 require("dotenv").config();
 
 const getDrivers = async (req, res) => {

@@ -18,7 +18,7 @@ const ridesSchema = new Schema(
     },
     driver: {
         id: Number,
-        name: string
+        name: String
     },
     value: {
       type: Number
@@ -30,8 +30,8 @@ const ridesSchema = new Schema(
 
 const Customer = new Schema(
   {
-    id: {
-      type: Number,
+    customer_id: {
+      type: String,
       required: true,
       unique: true,
       max: 3,
@@ -39,7 +39,6 @@ const Customer = new Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
       max: 100,
     },
 
