@@ -8,22 +8,24 @@ const ridesSchema = new Schema(
       default: Date.now,
     },
     origin: {
-      type: String
+      type: String,
     },
     destination: {
-      type: String
+      type: String,
     },
     distance: {
-      type: Number
+      type: Number,
+    },
+    duration: {
+      type: String,
     },
     driver: {
-        id: Number,
-        name: String
+      id: Number,
+      name: String,
     },
     value: {
-      type: Number
-    }
-    
+      type: Number,
+    },
   },
   { timestamps: true }
 );

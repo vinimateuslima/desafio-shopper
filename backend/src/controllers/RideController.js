@@ -1,3 +1,4 @@
+const { response } = require("express");
 const Customer = require("../models/Customer");
 const Driver = require("../models/Driver");
 require("dotenv").config();
@@ -5,10 +6,19 @@ require("dotenv").config();
 const estimate = async (req, res) => {
   const { customer_id, origin, destination } = req.body;
 
+  const customer = await Customer.findOne({ customer_id: customer_id });
+
   if (!customer_id || !origin || !destination) {
     return res.status(400).json({
       error_code: "INVALID_DATA",
       error_description: "Por favor, preencha todos os campos obrigatórios.",
+    });
+  }
+
+  if (!customer) {
+    return res.status(404).json({
+      error_code: "NOT_FOUND",
+      error_description: "Cliente não encontrado",
     });
   }
 
@@ -26,7 +36,7 @@ const estimate = async (req, res) => {
     .then(async (data) => {
       const distance = data.routes[0].legs[0].distance.value / 1000;
 
-      const availableDrivers = await Driver.find({ value: { $lte: distance } });
+      const availableDrivers = await Driver.find({ kmMin: { $lte: distance } });
 
       const options = availableDrivers.map((driver) => {
         const calculatedValue = distance * driver.tax;
@@ -44,6 +54,8 @@ const estimate = async (req, res) => {
         };
       });
 
+      options.sort((a, b) => parseFloat(a.value) - parseFloat(b.value));
+
       const dataEstimate = {
         origin: {
           latitude: data.routes[0].legs[0].start_location.lat,
@@ -54,8 +66,8 @@ const estimate = async (req, res) => {
           longitude: data.routes[0].legs[0].end_location.lng,
         },
 
-        distance: distance,
-        duration: data.routes[0].legs[0].duration.value,
+        distance: data.routes[0].legs[0].distance.value,
+        duration: data.routes[0].legs[0].duration.text,
         options,
         routerResponse: data.routes,
       };
@@ -104,7 +116,7 @@ const confirm = async (req, res) => {
     const customer = await Customer.findOne({ customer_id: customer_id });
 
     if (!customer) {
-      return res.status(400).json({
+      return res.status(404).json({
         error_code: "CUSTOMER_NOT_FOUND",
         error_description: "Cliente não encontrado",
       });
@@ -131,6 +143,7 @@ const confirm = async (req, res) => {
       origin: origin,
       destination: destination,
       distance: distance,
+      duration: duration,
       driver: {
         id: driver.id,
         name: driverFound.name,
@@ -171,14 +184,17 @@ const getCustomerRides = async (req, res) => {
 
 const getCustomerRidesByDriver = async (req, res) => {
   try {
-    const { customer_id } = req.params; // Pega o ID do cliente da URL
-    const { driver_id } = req.query;    // Pega o driver_id da query (se fornecido)
+    const { customer_id } = req.params;
+    const { driver_id } = req.query;
 
-    // Busca o cliente e todas as suas corridas
-    const customer = await Customer.findOne(
-      { customer_id },
-      { rides: 1 } // Retorna todas as corridas
-    );
+    const customer = await Customer.findOne({ customer_id }, { rides: 1 });
+
+    if (!customer_id) {
+      return res.status(400).json({
+        error_code: "INVALID_DATA",
+        error_description: "Por favor, preencha todos os campos obrigatórios.",
+      });
+    }
 
     if (!customer || !customer.rides.length) {
       return res.status(404).send({
@@ -187,24 +203,28 @@ const getCustomerRidesByDriver = async (req, res) => {
       });
     }
 
-    // Filtra as corridas pelo driver_id, se fornecido
     let filteredRides = customer.rides;
+
+    // Verificando se foi passado o id do motorista no parametro
     if (driver_id) {
       filteredRides = customer.rides.filter(
-        (ride) => ride.driver.id === driver_id
+        (ride) => ride.driver.id.toString() === driver_id
       );
     }
 
-    // Caso não encontre corridas após o filtro
     if (!filteredRides.length) {
       return res.status(404).send({
         error_code: "NO_RIDES_FOUND",
-        error_description: "Nenhuma corrida encontrada para o motorista fornecido.",
+        error_description:
+          "Nenhuma corrida encontrada para o motorista fornecido.",
       });
     }
 
-    // Formata as corridas no formato desejado
-    const formattedRides = filteredRides.map(ride => ({
+    filteredRides = filteredRides.sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+
+    const formattedRides = filteredRides.map((ride) => ({
       id: ride._id,
       date: ride.date,
       origin: ride.origin,
@@ -213,23 +233,21 @@ const getCustomerRidesByDriver = async (req, res) => {
       duration: ride.duration,
       driver: {
         id: ride.driver.id,
-        name: ride.driver.name
+        name: ride.driver.name,
       },
-      value: ride.value
+      value: ride.value,
     }));
 
     // Retorna a resposta no formato desejado
     res.status(200).json({
       customer_id,
-      rides: formattedRides
+      rides: formattedRides,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).send("Ocorreu um erro ao buscar as corridas.");
   }
 };
-
 
 module.exports = {
   estimate,

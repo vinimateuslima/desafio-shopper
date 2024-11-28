@@ -6,7 +6,7 @@ mongoose.set("strictQuery", true);
 
 async function main() {
   await mongoose.connect(
-    `mongodb+srv://${process.env.DBUSER}:${process.env.DBPASS}@cluster0.qnyk3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+    `mongodb+srv://viniciusmateusdev:NQhUPzWDhl0vBior@cluster0.qnyk3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
   );
 
 
