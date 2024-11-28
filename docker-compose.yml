@@ -1,9 +1,9 @@
 services:
-  backend-desafio-shopper:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend
+    container_name: backend-desafio-shopper
     ports:
       - "8080:8080"
     environment:
@@ -13,17 +13,15 @@ services:
     networks:
       - app-network
 
-  frontend-desafio-shopper:
+  frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
+    container_name: frontend-desafio-shopper
     ports:
       - "80:80"
     environment:
       - NODE_ENV=production
-    volumes:
-      - ./frontend:/frontend
     networks:
       - app-network
 

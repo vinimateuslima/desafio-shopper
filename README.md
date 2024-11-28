@@ -4,6 +4,8 @@ Este projeto é uma aplicação para transporte particular, feita para o Desafio
 
 Nome: Vinicius Lima
 
+NOTA: Infelizmente, não consegui desenvolver em Typscript devido a não ter alcançado o conhecimento necessário, além de ter corrido para aprender Docker nesses dias, mas decidi fazer o projeto como um desafio mesmo e acho que consegui realizar 90% das funções.
+
 ## Tecnologias
 
 - **Frontend**: React, Vite
@@ -26,6 +28,12 @@ Existem duas variáveis de ambiente
 Frontend
 
 VITE_GOOGLE_API_KEY
+
+O banco de dados é em MondoDB na Nuvem, podem utilizar o meu onde ja está cadastrado os usuários de testes
+
+Clientes podem ser cadastrados nos endpoints
+
+
 
 ### Rodando localmente
 
