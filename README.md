@@ -25,6 +25,10 @@ NOTA: Infelizmente, não consegui desenvolver em Typscript devido a não ter alc
 
 Existem duas variáveis de ambiente
 
+Backend
+
+GOOGLE_API_KEY
+
 Frontend
 
 VITE_GOOGLE_API_KEY
